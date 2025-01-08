@@ -47,6 +47,9 @@ export function MapApp() {
   const [sliderValue, setSliderValue] = useState<number>(1);
   const [safetyRating, setSafetyRating] = useState<string>('');
   const [timeEfficiencyRating, setTimeEfficiencyRating] = useState<string>('');
+  const [nearestNodeMapping, setNearestNodeMapping] = useState({});
+  const [startId, setStartId] = useState<string>('');
+  const [endId, setEndId] = useState<string>('');
 
 
 
@@ -107,7 +110,7 @@ export function MapApp() {
 
       // Add address Layer
       const addressVectorSource = new VectorSource({
-        url: './data/matching_hsnr_features_with_address.geojson', 
+        url: './data/matching_hsnr_features_with_address.geojson',
         format: new GeoJSON({
           dataProjection: 'EPSG:3857',
           featureProjection: 'EPSG:3857'
@@ -182,105 +185,105 @@ export function MapApp() {
       /*
       Dieser Code wird benötigt um category hinzuzufügen. wird in der fertigen applikation aber nicht benötigt.
       */
-     /*
-      // Sobald die Daten ready sind ...
-      vectorSource2.once('change', function () {
-
-
-        if (vectorSource2.getState() === 'ready') {
-          const features = vectorSource2.getFeatures();
-          console.log(features)
-
-          const relevantProps = [
-            'bicycle',
-            'cycleway',
-            'cycleway_left',
-            'cycleway_right',
-            'bicycle_road',
-            'cycleway_right_bicycle',
-            'cycleway_left_bicycle'
-          ];
-
-          // Kategorien
-          const withoutCycleHighwayGroup = [];
-          const withoutCycleOther = [];
-          const cyclePropsYesDesignated = [];
-          const cyclePropsOther = [];
-
-          features.forEach((feature) => {
-            const properties = feature.getProperties();
-            console.log(properties)
-
-            // Prüfen, ob eine relevante Rad-Property vorhanden ist
-            const hasCycleProp = relevantProps.some((prop) => {
-              return properties[prop] != null && properties[prop] !== '';
-            });
-
-            if (!hasCycleProp) {
-              // Keine Radinfrastruktur, weiter unterteilen nach highway-Werten
-              const highway = properties.highway;
-              if (
-                highway === 'residential' ||
-                highway === 'living_street' ||
-                highway === 'bridleway' ||
-                highway === 'track'
-              ) {
-                feature.set('category_number', 2);
-                withoutCycleHighwayGroup.push(feature);
-              } else {
-                feature.set('category_number', 1);
-                withoutCycleOther.push(feature);
-              }
-            } else {
-              // Hat Radinfrastruktur, nun verfeinern:
-              const bicycleValue = properties.bicycle;
-              const bicycleRoadValue = properties.bicycle_road;
-
-              const isYesOrDesignated =
-                bicycleValue === 'yes' ||
-                bicycleValue === 'designated' ||
-                bicycleRoadValue === 'yes' ||
-                bicycleRoadValue === 'designated';
-
-              if (isYesOrDesignated) {
-                feature.set('category_number', 4);
-                cyclePropsYesDesignated.push(feature);
-              } else {
-                feature.set('category_number', 3);
-                cyclePropsOther.push(feature);
-              }
-            }
-
-            // Style anwenden
-            streetDataLayer.setStyle(styleByCategory);
-          });
-
-          const geoJSONFormat = new GeoJSON();
-
-          // Features als GeoJSON exportieren
-          const geojsonStr = geoJSONFormat.writeFeatures(features);
-          const blob = new Blob([geojsonStr], { type: 'application/json' });
-
-          // URL für den Blob erstellen
-          const url = URL.createObjectURL(blob);
-
-          // Temporären Link erstellen
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = 'exportedGeojsonRouting.geojson';
-
-          // Link zum Dokument hinzufügen und Klick simulieren
-          document.body.appendChild(link);
-          link.click();
-
-          // Link wieder entfernen
-          document.body.removeChild(link);
-
-          // URL freigeben
-          URL.revokeObjectURL(url);
-        }
-      });
-      */
+      /*
+       // Sobald die Daten ready sind ...
+       vectorSource2.once('change', function () {
+ 
+ 
+         if (vectorSource2.getState() === 'ready') {
+           const features = vectorSource2.getFeatures();
+           console.log(features)
+ 
+           const relevantProps = [
+             'bicycle',
+             'cycleway',
+             'cycleway_left',
+             'cycleway_right',
+             'bicycle_road',
+             'cycleway_right_bicycle',
+             'cycleway_left_bicycle'
+           ];
+ 
+           // Kategorien
+           const withoutCycleHighwayGroup = [];
+           const withoutCycleOther = [];
+           const cyclePropsYesDesignated = [];
+           const cyclePropsOther = [];
+ 
+           features.forEach((feature) => {
+             const properties = feature.getProperties();
+             console.log(properties)
+ 
+             // Prüfen, ob eine relevante Rad-Property vorhanden ist
+             const hasCycleProp = relevantProps.some((prop) => {
+               return properties[prop] != null && properties[prop] !== '';
+             });
+ 
+             if (!hasCycleProp) {
+               // Keine Radinfrastruktur, weiter unterteilen nach highway-Werten
+               const highway = properties.highway;
+               if (
+                 highway === 'residential' ||
+                 highway === 'living_street' ||
+                 highway === 'bridleway' ||
+                 highway === 'track'
+               ) {
+                 feature.set('category_number', 2);
+                 withoutCycleHighwayGroup.push(feature);
+               } else {
+                 feature.set('category_number', 1);
+                 withoutCycleOther.push(feature);
+               }
+             } else {
+               // Hat Radinfrastruktur, nun verfeinern:
+               const bicycleValue = properties.bicycle;
+               const bicycleRoadValue = properties.bicycle_road;
+ 
+               const isYesOrDesignated =
+                 bicycleValue === 'yes' ||
+                 bicycleValue === 'designated' ||
+                 bicycleRoadValue === 'yes' ||
+                 bicycleRoadValue === 'designated';
+ 
+               if (isYesOrDesignated) {
+                 feature.set('category_number', 4);
+                 cyclePropsYesDesignated.push(feature);
+               } else {
+                 feature.set('category_number', 3);
+                 cyclePropsOther.push(feature);
+               }
+             }
+ 
+             // Style anwenden
+             streetDataLayer.setStyle(styleByCategory);
+           });
+ 
+           const geoJSONFormat = new GeoJSON();
+ 
+           // Features als GeoJSON exportieren
+           const geojsonStr = geoJSONFormat.writeFeatures(features);
+           const blob = new Blob([geojsonStr], { type: 'application/json' });
+ 
+           // URL für den Blob erstellen
+           const url = URL.createObjectURL(blob);
+ 
+           // Temporären Link erstellen
+           const link = document.createElement('a');
+           link.href = url;
+           link.download = 'exportedGeojsonRouting.geojson';
+ 
+           // Link zum Dokument hinzufügen und Klick simulieren
+           document.body.appendChild(link);
+           link.click();
+ 
+           // Link wieder entfernen
+           document.body.removeChild(link);
+ 
+           // URL freigeben
+           URL.revokeObjectURL(url);
+         }
+       });
+       */
     } else {
       return;
     }
@@ -312,28 +315,30 @@ export function MapApp() {
       .then((data) => {
         const rows = data.split("\n").slice(1);
         const mapping = {};
+        const nearestNodeMap = {};
         const addresses = rows.map((row) => {
-          const [address, plannedAreaId] = row.split(",");
-          if (address && plannedAreaId) {
-            mapping[address] = plannedAreaId.trim();
-            return address;
-          }
-          return null;
+            const [address, plannedAreaId, nearest_node] = row.split(";");
+            if (address && plannedAreaId) {
+                mapping[address] = plannedAreaId.trim();
+                if (nearest_node) {
+                    nearestNodeMap[address] = nearest_node.trim();
+                }
+                return address;
+            }
+            return null;
         }).filter((address) => address);
         setAddressToAreaMapping(mapping);
+        setNearestNodeMapping(nearestNodeMap); // nearestNodeMapping wird aktualisiert
         setAddressSuggestions(addresses);
-      });
+    });
   }
 
 
   function calculateRoute() {
-    console.log(startAddress)
-    console.log(destinationAddress)
-    const startId = "406151.820937201,5758898.358848147";
-    const endId = "406164.8880599412,5758893.140318773"
+    console.log(startId)
+    console.log(endId)
 
-
-    fetch('./data/graph (8).json') // Pfad zur Datei relativ zu deinem Skript
+    fetch('./data/graph (40).json') // Pfad zur Datei relativ zu deinem Skript
       .then((response) => {
         if (!response.ok) {
           throw new Error("Fehler beim Laden der Datei");
@@ -341,9 +346,9 @@ export function MapApp() {
         return response.json();
       })
       .then((graphObject) => {
-        
-        const graph = new Map(Object.entries(graphObject)); // JSON in Map umwandeln
-        console.log("Graph erfolgreich geladen:", graph);
+
+        const calculatedGraph = new Map(Object.entries(graphObject)); // JSON in Map umwandeln
+        console.log("Graph erfolgreich geladen:", calculatedGraph);
 
         // Nutze den geladenen Graph
 
@@ -367,19 +372,20 @@ export function MapApp() {
           const { node: currentNode, costVector: currentCostVec } = current;
 
           // Abbruchbedingung: Zielknoten erreicht
-        if (currentNode === endId) {
-          console.log("Zielknoten erreicht:", endId);
-          console.log("Pareto-Front am Zielknoten:", paretoFront.get(endId));
-          return paretoFront.get(endId); // Rückgabe der Pareto-Front des Zielknotens
-        }
+          if (currentNode === endId) {
+            console.log("Zielknoten erreicht:", endId);
+            console.log("Pareto-Front am Zielknoten:", paretoFront);
+            reconstructPath(paretoFront, startId, endId, calculatedGraph); // Rückgabe der Pareto-Front des Zielknotens
+            return;
+          }
 
           // Betrachte alle Nachbarn von currentNode
-          const edges = graph.get(currentNode) || [];
+          const edges = calculatedGraph.get(currentNode) || [];
           edges.forEach((edge) => {
             const nextNode = edge.node;
 
             // Berechne neuen Kostenvektor für nextNode
-            
+
             const edgeCostVec = getUnweightedCostVector(edge.length, edge.category);
             const newCostVec = vectorAdd(currentCostVec, edgeCostVec);
 
@@ -425,8 +431,6 @@ export function MapApp() {
         // Rückgabe: Die Pareto-Front aller Knoten
         //mit paretoFront.get(endId) kriegt man das ergebnis für den zielknoten
         console.log(paretoFront.get(endId))
-        return paretoFront;
-
       })
       .catch((error) => console.error("Fehler:", error));
     // Pareto-Front: Map<Knoten, [ { costVector: number[], predecessor: string } ] >
@@ -473,14 +477,10 @@ export function MapApp() {
       const geometry = feature.geometry;
       const properties = feature.properties;
 
-
       if (geometry.type === "LineString") {
         const coordinates = geometry.coordinates;
         const length = properties.length;
-        
-
         const category = properties.category_number;
-
 
         // Gehe alle Segmente im LineString durch
         for (let i = 0; i < coordinates.length - 1; i++) {
@@ -492,12 +492,24 @@ export function MapApp() {
             graph.set(fromCoord, []);
           }
           graph.get(fromCoord).push({ node: toCoord, length, category });
+
+          // Kante vom Endpunkt zurück zum Startpunkt hinzufügen (bidirektional)
+          if (!graph.has(toCoord)) {
+            graph.set(toCoord, []);
+          }
+          graph.get(toCoord).push({ node: fromCoord, length, category });
         }
       }
     });
 
     return graph;
   }
+
+  // Helper: Konvertiert Koordinaten in Strings
+  function coordToId(coord) {
+    return coord.join(",");
+  }
+
   // Helper-Funktion: Konvertiert Koordinatenpaar in einen String (z. B. "13.4050,52.5200")
   function coordToId(coord) {
     return coord.join(",");
@@ -545,8 +557,7 @@ export function MapApp() {
       graph.forEach((edges) => {
         edgeCount += edges.length;
       });
-          
-
+        
 
     })
     
@@ -554,6 +565,67 @@ export function MapApp() {
 
 
   // Hier fehlt noch eine Funktion mit der wir den pareto pfad zurückverfolgen können um die routen zu finden.
+
+  function reconstructPath(paretoFront, startId, endId, graph) {
+    const results = [];
+    const endPareto = paretoFront.get(endId);
+
+    if (!endPareto) {
+      console.error("Kein Pfad zum Zielknoten gefunden.");
+      return results;
+    }
+
+    // Für jeden nicht-dominierten Zustand am Zielknoten den Pfad rekonstruieren
+    endPareto.forEach((entry) => {
+      const path = [];
+      let currentEntry = entry;
+      let currentNode = endId;
+
+      // Rückwärts den Pfad entlanggehen
+      while (currentEntry) {
+        path.push(currentNode); // Füge aktuellen Knoten zum Pfad hinzu
+        currentNode = currentEntry.predecessor; // Gehe zum Vorgängerknoten
+
+        if (!currentNode) break; // Wenn kein Vorgänger mehr existiert, sind wir am Start
+
+        const predecessorPareto = paretoFront.get(currentNode);
+        if (!predecessorPareto) {
+          console.error("Kein Pareto-Eintrag für den Vorgängerknoten gefunden:", currentNode);
+          break;
+        }
+
+        currentEntry = predecessorPareto.find((e) =>
+          arraysEqual(
+            vectorAdd(e.costVector, getEdgeCost(currentNode, path[path.length - 1], graph)),
+            currentEntry.costVector
+          )
+        );
+      }
+
+      // Pfad umkehren, da er rückwärts aufgebaut wurde
+      results.push({
+        path: path.reverse(), // Start → Ziel
+        costVector: entry.costVector, // Kosten des Pfades
+      });
+    });
+
+    console.log(results)
+    return results;
+  }
+
+  function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((val, idx) => val === arr2[idx]);
+  }
+
+
+  // Hilfsfunktion: Kostenvektor für eine Kante berechnen
+  function getEdgeCost(fromNode, toNode, graph) {
+    const edges = graph.get(fromNode) || [];
+    const edge = edges.find((e) => e.node === toNode);
+    return edge ? getUnweightedCostVector(edge.length, edge.category) : null;
+  }
+
 
 
   return (
@@ -574,43 +646,42 @@ export function MapApp() {
             Enter Start and Destination Address
           </Text>
           <Select
-            // Bei Single-Select: value erwartet ein Objekt oder null
-            // Wir wandeln state (string) in {value, label} um
             value={
-              startAddress
-                ? { value: startAddress, label: startAddress }
+              startId
+                ? { value: startId, label: startAddress }
                 : null
             }
             options={addressSuggestions.map((address) => ({
-              value: address,
-              label: address,
+              value: nearestNodeMapping[address], // nearest_node wird hier als value verwendet
+              label: address, // Adresse bleibt als Anzeige
             }))}
-            onChange={(selectedOption) =>
-              setStartAddress(selectedOption ? selectedOption.value : "")
-            }
+            onChange={(selectedOption) => {
+              setStartId(selectedOption ? selectedOption.value : ""); // nearest_node wird direkt gesetzt
+              setStartAddress(selectedOption ? selectedOption.label : ""); // Adresse wird ebenfalls gespeichert
+            }}
             placeholder="Please enter your starting address"
             isClearable
             styles={{
               container: (provided) => ({
                 ...provided,
-                marginBottom: "16px", // Abstand zwischen den Select-Feldern
+                marginBottom: "16px",
               }),
             }}
           />
           <Select
-            // Auch hier: Wir brauchen ein Objekt oder null
             value={
-              destinationAddress
-                ? { value: destinationAddress, label: destinationAddress }
+              endId
+                ? { value: endId, label: destinationAddress }
                 : null
             }
             options={filteredDestinations.map((address) => ({
-              value: address,
-              label: address,
+              value: nearestNodeMapping[address], // nearest_node wird hier als value verwendet
+              label: address, // Adresse bleibt als Anzeige
             }))}
-            onChange={(selectedOption) =>
-              setDestinationAddress(selectedOption ? selectedOption.value : "")
-            }
+            onChange={(selectedOption) => {
+              setEndId(selectedOption ? selectedOption.value : ""); // nearest_node wird direkt gesetzt
+              setDestinationAddress(selectedOption ? selectedOption.label : ""); // Adresse wird ebenfalls gespeichert
+            }}
             placeholder="Please enter your destination address"
             isClearable
             isDisabled={!startAddress}
