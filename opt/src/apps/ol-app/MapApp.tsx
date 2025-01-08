@@ -439,7 +439,7 @@ export function MapApp() {
 
 
   // Hilfsfunktion für die Routenberechnung: Für jede Kante wird der Kostenvektor berechnet 
-  // ! ACHTUNG ! Bisher ist hier noch keine Gewichtung vorhanden.
+  // ! ACHTUNG ! Bisher ist hier noch keine Gewichtung vorhanden. 
   function getUnweightedCostVector(length, category) {
 
     const costVector = new Array(4).fill(0);
